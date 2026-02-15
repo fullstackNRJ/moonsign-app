@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install build dependencies for native modules (swisseph-v2)
+RUN apk add --no-cache python3 make g++
+
 COPY package*.json ./
 RUN npm install
 
@@ -13,6 +16,10 @@ RUN npm run build
 FROM node:20-alpine
 
 WORKDIR /app
+
+# Copy package files and install production dependencies
+# We also need these tools here in case some post-install scripts run for native modules
+RUN apk add --no-cache python3 make g++
 
 COPY --from=builder /app/package*.json ./
 RUN npm install --omit=dev
