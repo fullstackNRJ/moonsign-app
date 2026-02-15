@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moon Sign Calculator | Vedic Secrets</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #d4af37;
+            --success: #2ecc71;
+            --bg: #ffffff;
+            --text: #333;
+            --text-light: #666;
+            --border: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .moon-logo {
+            font-size: 3rem;
+            color: #f1c40f;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .label {
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--success);
+        }
+
+        /* Autocomplete */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 5px;
+        }
+
+        .autocomplete-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .autocomplete-item strong {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .autocomplete-item small {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .checkbox-container input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .calc-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 18px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
+
+        .calc-btn:hover {
+            background-color: #219150;
+        }
+
+        .calc-btn:disabled {
+            background-color: #ccc;
+        }
+
+        /* Results Display */
+        #results {
+            display: none;
+            width: 100%;
+            margin-top: 50px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .moon-display {
+            margin: 40px 0;
+        }
+
+        .moon-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .other-signs {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 30px;
+            padding-top: 40px;
+            border-top: 1px solid #eee;
+        }
+
+        .planet-card {
+            text-align: center;
+        }
+
+        .planet-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .planet-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .planet-value {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        @media (max-width: 600px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-overlay" id="loading">Calculating...</div>
+
+    <div class="container">
+        <div class="header">
+            <span class="moon-logo">🌙</span>
+            <h1>Moon Sign Calculator</h1>
+            <p class="subtitle">Discover which constellation the Moon was in at your birth</p>
+        </div>
+
+        <form id="calcForm">
+            <div class="form-section">
+                <label class="label">First Name</label>
+                <input type="text" id="firstName" placeholder="Type here..." required>
+            </div>
+
+            <div class="form-section">
+                <label class="label">City of Birth</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="cityInput" placeholder="Start typing city name..." autocomplete="off"
+                        required>
+                    <div id="autocompleteResults" class="autocomplete-results"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label class="label">Date of Birth</label>
+                <div class="grid-3">
+                    <select id="birthMonth" required>
+                        <option value="" disabled selected>Month</option>
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                    <input type="number" id="birthDay" placeholder="Day" min="1" max="31" required>
+                    <input type="number" id="birthYear" placeholder="Year" min="1800" max="2100" required>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label class="label">Time of Birth</label>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="birthTimeUnknown"> I DON'T KNOW THE TIME OF BIRTH
+                </label>
+                <div class="grid-3" id="timeGrid">
+                    <input type="number" id="birthHour" placeholder="Hour" min="1" max="12">
+                    <input type="number" id="birthMin" placeholder="Min" min="0" max="59">
+                    <select id="birthAmPm">
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit" class="calc-btn" id="submitBtn">Calculate Moon Sign</button>
+            </div>
+        </form>
+
+        <div id="results">
+            <h2 style="font-family: 'Playfair Display'; color: var(--accent);">Your Moon Sign</h2>
+            <div class="moon-display">
+                <span id="moonEmoji" style="font-size: 5rem;">♑</span>
+                <div id="moonName" class="moon-name">Capricorn</div>
+            </div>
+
+            <h3 style="font-family: 'Playfair Display'; margin-top: 60px;">Your Other Signs</h3>
+            <div id="otherSigns" class="other-signs"></div>
+        </div>
+    </div>
+
+    <script>
+        const PLANET_EMOJIS = {
+            Su: '☀️', Mo: '🌙', Me: '☿', Ve: '♀', Ma: '♂',
+            Ju: '♃', Sa: '♄', Ur: '♅', Ne: '♆', Pl: '♇',
+            Ra: '🐉', Ke: '🐍', La: '🏹'
+        };
+
+        const RASHI_EMOJIS = {
+            Ar: '♈', Ta: '♉', Ge: '♊', Cn: '♋', Le: '♌', Vi: '♍',
+            Li: '♎', Sc: '♏', Sg: '♐', Cp: '♑', Aq: '♒', Pi: '♓'
+        };
+
+        const RASHI_NAMES = {
+            Ar: 'Aries', Ta: 'Taurus', Ge: 'Gemini', Cn: 'Cancer', Le: 'Leo', Vi: 'Virgo',
+            Li: 'Libra', Sc: 'Scorpio', Sg: 'Sagittarius', Cp: 'Capricorn', Aq: 'Aquarius', Pi: 'Pisces'
+        };
+
+        const cityInput = document.getElementById('cityInput');
+        const resultsBox = document.getElementById('autocompleteResults');
+        let selectedCoords = null;
+
+        // Autocomplete logic
+        let debounceTimer;
+        cityInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const val = cityInput.value;
+            if (val.length < 2) {
+                resultsBox.style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch('/api/geocode', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ q: val })
+                    });
+                    const data = await res.json();
+
+                    if (Array.isArray(data) && data.length > 0) {
+                        resultsBox.innerHTML = '';
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'autocomplete-item';
+                            div.innerHTML = `<strong>${item.name}</strong><small>${item.subtext}</small>`;
+                            div.onclick = () => {
+                                cityInput.value = item.displayName;
+                                selectedCoords = { lat: item.lat, lng: item.lng };
+                                resultsBox.style.display = 'none';
+                            };
+                            resultsBox.appendChild(div);
+                        });
+                        resultsBox.style.display = 'block';
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }, 300);
+        });
+
+        // Unknown time toggle
+        const unknownCheck = document.getElementById('birthTimeUnknown');
+        const timeGrid = document.getElementById('timeGrid');
+        unknownCheck.onchange = () => {
+            const inputs = timeGrid.querySelectorAll('input, select');
+            inputs.forEach(i => i.disabled = unknownCheck.checked);
+            timeGrid.style.opacity = unknownCheck.checked ? '0.5' : '1';
+        };
+
+        // Form Submission
+        const form = document.getElementById('calcForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            if (!selectedCoords) {
+                alert("Please select a city from the dropdown suggestions.");
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const month = document.getElementById('birthMonth').value;
+                const day = document.getElementById('birthDay').value;
+                const year = document.getElementById('birthYear').value;
+
+                let hour = 12;
+                let min = 0;
+
+                if (!unknownCheck.checked) {
+                    hour = parseInt(document.getElementById('birthHour').value) || 12;
+                    min = parseInt(document.getElementById('birthMin').value) || 0;
+                    const ampm = document.getElementById('birthAmPm').value;
+                    if (ampm === 'PM' && hour < 12) hour += 12;
+                    if (ampm === 'AM' && hour === 12) hour = 0;
+                }
+
+                const date = new Date(year, month, day, hour, min);
+                const isoString = date.toISOString();
+
+                const res = await fetch('/api/rashi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        dateTime: isoString,
+                        latitude: selectedCoords.lat,
+                        longitude: selectedCoords.lng
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    renderResults(data);
+                } else {
+                    alert(data.error || 'Calculation failed');
+                }
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        };
+
+        function renderResults(data) {
+            const moonSign = data.moon.rashi;
+            document.getElementById('moonEmoji').innerText = RASHI_EMOJIS[moonSign] || '🌙';
+            document.getElementById('moonName').innerText = RASHI_NAMES[moonSign] || moonSign;
+
+            const grid = document.getElementById('otherSigns');
+            grid.innerHTML = '';
+
+            const planets = data.allPlanets;
+            const order = ['Su', 'Me', 'Ve', 'Ma', 'Ju', 'Sa', 'Ra', 'Ke', 'La'];
+
+            order.forEach(key => {
+                if (!planets[key]) return;
+                const p = planets[key];
+                const card = document.createElement('div');
+                card.className = 'planet-card';
+                card.innerHTML = `
+                    <div class="planet-label">${key}</div>
+                    <span class="planet-icon">${PLANET_EMOJIS[key]}</span>
+                    <div class="planet-value">${RASHI_NAMES[p.rashi] || p.rashi}</div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>
