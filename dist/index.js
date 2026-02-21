@@ -40,6 +40,30 @@ catch (e) {
     console.warn('⚠️ swisseph-v2 not installed:', e.message);
 }
 const app = new Hono();
+// Global CORS headers used across responses
+const CORS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+};
+// Global CORS middleware: ensure every response includes the CORS headers
+app.use('*', async (c, next) => {
+    // Handle preflight quickly
+    if (c.req.method === 'OPTIONS') {
+        return new Response('', { status: 204, headers: CORS_HEADERS });
+    }
+    const res = await next();
+    // Clone headers and set CORS values (preserve other headers)
+    //@ts-ignore
+    const headers = new Headers(res.headers);
+    Object.entries(CORS_HEADERS).forEach(([k, v]) => headers.set(k, String(v)));
+    // Ensure body is forwarded correctly
+    //@ts-ignore
+    const body = await res.text();
+    //@ts-ignore
+    return new Response(body, { status: res.status, headers });
+});
 // 2. OpenAPI 3.1.0 Specification
 const openAPISpec = {
     openapi: '3.1.0',
@@ -200,13 +224,7 @@ else {
 </html>`);
     });
 }
-// CORS Helper
-const CORS_HEADERS = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json'
-};
+// (CORS headers are applied globally via middleware above)
 // Rashi Calculation API
 app.options('/api/rashi', (c) => new Response('', { status: 204, headers: CORS_HEADERS }));
 app.post('/api/rashi', async (c) => {
