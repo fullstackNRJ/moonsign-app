@@ -51,18 +51,17 @@ const CORS_HEADERS = {
 app.use('*', async (c, next) => {
     // Handle preflight quickly
     if (c.req.method === 'OPTIONS') {
-        return new Response('', { status: 204, headers: CORS_HEADERS });
+        return c.text('', 204, CORS_HEADERS);
     }
-    const res = await next();
-    // Clone headers and set CORS values (preserve other headers)
-    //@ts-ignore
-    const headers = new Headers(res.headers);
-    Object.entries(CORS_HEADERS).forEach(([k, v]) => headers.set(k, String(v)));
-    // Ensure body is forwarded correctly
-    //@ts-ignore
-    const body = await res.text();
-    //@ts-ignore
-    return new Response(body, { status: res.status, headers });
+    await next();
+    // Set CORS headers on the context response (avoid overriding Content-Type for static files or HTML)
+    Object.entries(CORS_HEADERS).forEach(([k, v]) => {
+        if (k === 'Content-Type' && c.res.headers.get('Content-Type')) {
+            // Skip overriding Content-Type if already set (e.g., for HTML or static files)
+            return;
+        }
+        c.header(k, String(v));
+    });
 });
 // 2. OpenAPI 3.1.0 Specification
 const openAPISpec = {
