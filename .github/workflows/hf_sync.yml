@@ -14,10 +14,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install git-lfs
+        run: |
+          sudo apt-get install -y git-lfs
+          git lfs install
+
       - name: Push to Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          # ✏️ Replace these two values with your actual HF username and Space name
           HF_USERNAME: freddy-jmdataai
           SPACE_NAME: moonsign
         run: |
@@ -29,6 +33,19 @@ jobs:
 
           cd /tmp/hf_deploy
           git init
+          git lfs install
+
+          # Track all binary file types via LFS
+          git lfs track "*.png"
+          git lfs track "*.jpg"
+          git lfs track "*.jpeg"
+          git lfs track "*.gif"
+          git lfs track "*.se1"
+
+          # .gitattributes must be committed first before binary files
+          git add .gitattributes
+          git commit -m "chore: add git-lfs tracking"
+
           git checkout -b main
           git add .
           git commit -m "deploy: $(date +'%Y-%m-%d %H:%M:%S') — ${{ github.sha }}"
