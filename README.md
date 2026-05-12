@@ -1,3 +1,15 @@
+---
+title: Moon Sign Calculator
+emoji: 🌙
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+short_description: Vedic Astrology moon sign (rashi) calculator API
+license: mit
+pinned: false
+---
+
 # Moon Sign (Rashi) Calculator
 
 A high-performance Vedic Astrology API and interactive calculator built with Hono and TypeScript.
@@ -30,7 +42,7 @@ A high-performance Vedic Astrology API and interactive calculator built with Hon
    ```bash
    npm run dev
    ```
-   Access the UI at `http://localhost:3000` and Swagger at `http://localhost:3000/docs`.
+   Access the UI at `http://localhost:7860` and Swagger at `http://localhost:7860/docs`.
 
 3. **Build**:
    ```bash
@@ -39,9 +51,18 @@ A high-performance Vedic Astrology API and interactive calculator built with Hon
 
 ## 🚀 Deployment
 
-This project is production-ready and can be deployed to platforms like **Railway**, **DigitalOcean App Platform**, or any Docker-compatible environment.
+### Hugging Face Spaces (Recommended)
 
-### Using Docker (Recommended)
+This app is deployed as a **Docker Space** on Hugging Face at port `7860`.
+
+Push to `main` on GitHub — the GitHub Actions workflow will automatically sync to Hugging Face.
+
+Live URL format:
+- `https://<space-name>.hf.space/`
+- `https://<space-name>.hf.space/api/rashi`
+- `https://<space-name>.hf.space/docs`
+
+### Using Docker Locally
 
 1. **Build Image**:
    ```bash
@@ -50,19 +71,17 @@ This project is production-ready and can be deployed to platforms like **Railway
 
 2. **Run Container**:
    ```bash
-   docker run -p 3000:3000 moonsign-app
+   docker run -p 7860:7860 moonsign-app
    ```
-
-### Railway / DigitalOcean
-- Connect your GitHub repository.
-- The `Dockerfile` will be automatically detected.
-- Set the `PORT` environment variable to `3000` (or leave as default).
 
 ## 🧮 API Endpoints
 
-- `GET /health`: Server and dependency health check.
-- `POST /api/geocode`: Search for locations or get precise coordinates.
-- `POST /api/rashi`: Calculate planetary positions based on birth details.
+- `GET  /health` — Server and dependency health check.
+- `HEAD /health` — Lightweight ping for uptime monitors (no response body).
+- `POST /api/geocode` — Search for locations or get precise coordinates.
+- `POST /api/rashi` — Calculate planetary positions based on birth details.
+- `GET  /docs` — Swagger UI.
+- `GET  /openapi.json` — Raw OpenAPI 3.1.0 spec.
 
 ## 📝 License
 

@@ -44,7 +44,7 @@ const app = new Hono();
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, HEAD, OPTIONS',
     'Content-Type': 'application/json'
 };
 // Global CORS middleware: ensure every response includes the CORS headers
@@ -77,7 +77,7 @@ const openAPISpec = {
     },
     servers: [
         {
-            url: `http://localhost:${Number(process.env.PORT) || 3000}`,
+            url: `http://localhost:${Number(process.env.PORT) || 7860}`,
             description: 'Development server'
         }
     ],
@@ -159,6 +159,7 @@ app.use('/*', serveStatic({ root: './public' }));
 // Health & OpenAPI JSON
 app.get('/', (c) => c.text('OK'));
 app.get('/health', (c) => c.json({ status: 'healthy', modules: { jyotish: !!jyotish, swisseph: !!swisseph } }));
+app.on('HEAD', '/health', (c) => new Response(null, { status: 200, headers: CORS_HEADERS }));
 app.get('/openapi.json', (c) => c.json(openAPISpec));
 // Geocoding API (using Nominatim)
 app.post('/api/geocode', async (c) => {
@@ -264,7 +265,7 @@ app.post('/api/rashi', async (c) => {
     }
 });
 // 4. Start Server
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 7860;
 serve({ fetch: app.fetch, port }, (info) => {
     console.log(`🚀 Server ready at http://localhost:${info.port}`);
     console.log(`📖 Documentation: http://localhost:${info.port}/docs`);

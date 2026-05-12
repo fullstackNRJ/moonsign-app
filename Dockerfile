@@ -17,8 +17,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files and install production dependencies
-# We also need these tools here in case some post-install scripts run for native modules
+# Install runtime build tools needed by native modules
 RUN apk add --no-cache python3 make g++
 
 COPY --from=builder /app/package*.json ./
@@ -28,6 +27,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/server ./server
 
-EXPOSE 3000
+# Hugging Face Spaces require port 7860
+EXPOSE 7860
 
 CMD ["node", "dist/index.js"]
